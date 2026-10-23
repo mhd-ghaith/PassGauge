@@ -1,0 +1,19 @@
+# IntelliJ
+.idea/
+*.iml
+*.iws
+out/
+
+# Compiled class files
+*.class
+
+# Packaging output (built locally, not checked in — see Releases instead)
+PassGauge-dist/
+PassGauge-release/
+*.jar
+*.exe
+*.msi
+
+# OS clutter
+.DS_Store
+Thumbs.db

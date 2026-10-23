@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.passgauge.controller.AppController"
+            styleClass="root-pane">
+
+    <fx:define>
+        <ToggleGroup fx:id="threadToggleGroup"/>
+        <ToggleGroup fx:id="chartMetricGroup"/>
+    </fx:define>
+
+    <top>
+        <VBox styleClass="header">
+            <padding><Insets top="18" right="28" bottom="18" left="28"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="14">
+                <Label text="&#128274;" styleClass="app-logo"/>
+                <Label text="PassGauge" styleClass="app-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ToggleButton fx:id="themeToggleButton" text="&#127769;  Dark Mode" styleClass="theme-toggle"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane fx:id="mainTabPane" styleClass="modern-tabs" tabClosingPolicy="UNAVAILABLE">
+
+            <!-- ========================= MODULE 1 ========================= -->
+            <Tab text="&#128272;  Strength Analyzer">
+                <ScrollPane fitToWidth="true" styleClass="tab-scroll">
+                    <VBox spacing="18">
+                        <padding><Insets top="22" right="28" bottom="28" left="28"/></padding>
+
+                        <VBox spacing="14" styleClass="results-card">
+                            <Label text="Check a password" styleClass="section-title"/>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <StackPane HBox.hgrow="ALWAYS">
+                                    <PasswordField fx:id="strengthPasswordField" promptText="Type a password to analyze..."
+                                                   styleClass="input-field"/>
+                                    <TextField fx:id="strengthPasswordPlainField" promptText="Type a password to analyze..."
+                                               styleClass="input-field" visible="false" managed="false"/>
+                                </StackPane>
+                                <Button fx:id="strengthEyeButton" styleClass="eye-toggle-button"/>
+                            </HBox>
+
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <Label text="GENERATE" styleClass="field-label-dark"/>
+                                <Spinner fx:id="genLengthSpinner" prefWidth="80" editable="true" styleClass="modern-spinner"/>
+                                <Button fx:id="generateButton" text="Generate strong password" styleClass="secondary-button"/>
+                                <Button fx:id="copyButton" text="Copy" styleClass="secondary-button"/>
+                            </HBox>
+
+                            <Label text="&#128274; Processed entirely on your device. Nothing is transmitted or saved."
+                                   styleClass="privacy-note" wrapText="true"/>
+                        </VBox>
+
+                        <VBox spacing="14" styleClass="results-card">
+                            <Label text="Strength" styleClass="section-title"/>
+                            <HBox spacing="10" alignment="CENTER_LEFT">
+                                <HBox fx:id="meterBox" spacing="4">
+                                    <Region styleClass="meter-segment"/>
+                                    <Region styleClass="meter-segment"/>
+                                    <Region styleClass="meter-segment"/>
+                                    <Region styleClass="meter-segment"/>
+                                    <Region styleClass="meter-segment"/>
+                                </HBox>
+                                <Label fx:id="scoreLabel" text="Enter a password" styleClass="score-label"/>
+                            </HBox>
+                            <Label fx:id="explanationLabel" text="" wrapText="true" styleClass="explanation-label"/>
+                        </VBox>
+
+                        <HBox spacing="16">
+                            <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="results-card">
+                                <Label text="Feedback" styleClass="section-title"/>
+                                <ListView fx:id="feedbackList" styleClass="modern-list" prefHeight="150"/>
+                            </VBox>
+                            <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="results-card">
+                                <Label text="Suggestions" styleClass="section-title"/>
+                                <ListView fx:id="suggestionsList" styleClass="modern-list" prefHeight="150"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!-- ========================= MODULE 2 ========================= -->
+            <Tab text="&#9889;  Benchmark">
+                <ScrollPane fitToWidth="true" styleClass="tab-scroll">
+                    <VBox spacing="16">
+                        <padding><Insets top="22" right="28" bottom="28" left="28"/></padding>
+
+                        <VBox spacing="14" styleClass="results-card">
+                            <Label text="Benchmark setup" styleClass="section-title"/>
+                            <HBox alignment="BOTTOM_LEFT" spacing="22">
+                                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                    <Label text="PASSWORD TO TEST" styleClass="field-label-dark"/>
+                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                        <StackPane HBox.hgrow="ALWAYS">
+                                            <PasswordField fx:id="passwordField" promptText="e.g. abc123" styleClass="input-field"/>
+                                            <TextField fx:id="passwordPlainField" promptText="e.g. abc123" styleClass="input-field"
+                                                       visible="false" managed="false"/>
+                                        </StackPane>
+                                        <Button fx:id="passwordEyeButton" styleClass="eye-toggle-button"/>
+                                    </HBox>
+                                    <HBox spacing="6">
+                                        <Label fx:id="chipLower" text="a-z" styleClass="charset-chip"/>
+                                        <Label fx:id="chipUpper" text="A-Z" styleClass="charset-chip"/>
+                                        <Label fx:id="chipDigit" text="0-9" styleClass="charset-chip"/>
+                                        <Label fx:id="chipSymbol" text="#@!" styleClass="charset-chip"/>
+                                    </HBox>
+                                </VBox>
+                                <VBox spacing="6">
+                                    <Label text="MAX LENGTH" styleClass="field-label-dark"/>
+                                    <Spinner fx:id="maxLengthSpinner" prefWidth="90" editable="true" styleClass="modern-spinner"/>
+                                </VBox>
+                                <VBox spacing="6">
+                                    <Label text="THREADS" styleClass="field-label-dark"/>
+                                    <HBox spacing="6">
+                                        <ToggleButton text="1" toggleGroup="$threadToggleGroup" styleClass="chip"/>
+                                        <ToggleButton text="2" toggleGroup="$threadToggleGroup" styleClass="chip"/>
+                                        <ToggleButton text="4" toggleGroup="$threadToggleGroup" styleClass="chip" selected="true"/>
+                                        <ToggleButton text="8" toggleGroup="$threadToggleGroup" styleClass="chip"/>
+                                        <ToggleButton text="16" toggleGroup="$threadToggleGroup" styleClass="chip"/>
+                                    </HBox>
+                                </VBox>
+                                <VBox spacing="6">
+                                    <Label text=" " styleClass="field-label-dark"/>
+                                    <Button fx:id="runButton" text="&#9654;  Run Benchmark" styleClass="run-button"/>
+                                </VBox>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <ProgressIndicator fx:id="progressIndicator" styleClass="mini-progress" prefWidth="16" prefHeight="16" visible="false"/>
+                                <Label fx:id="statusLabel" text="Enter a password and click Run Benchmark." styleClass="status-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="keyspaceLabel" text="" styleClass="keyspace-label"/>
+                            </HBox>
+                        </VBox>
+
+                        <HBox spacing="18">
+                            <VBox spacing="16" prefWidth="430" styleClass="results-card">
+                                <Label text="Results" styleClass="section-title"/>
+                                <VBox fx:id="metricsBox" spacing="14">
+                                    <HBox spacing="10">
+                                        <VBox styleClass="metric-tile" HBox.hgrow="ALWAYS">
+                                            <Label text="SEQUENTIAL" styleClass="metric-label"/>
+                                            <Label fx:id="sequentialTimeLabel" text="&#8212;" styleClass="metric-value"/>
+                                        </VBox>
+                                        <VBox styleClass="metric-tile" HBox.hgrow="ALWAYS">
+                                            <Label text="PARALLEL" styleClass="metric-label"/>
+                                            <Label fx:id="parallelTimeLabel" text="&#8212;" styleClass="metric-value"/>
+                                        </VBox>
+                                        <VBox styleClass="metric-tile" HBox.hgrow="ALWAYS">
+                                            <Label text="EFFICIENCY" styleClass="metric-label"/>
+                                            <Label fx:id="efficiencyLabel" text="&#8212;" styleClass="metric-value"/>
+                                        </VBox>
+                                    </HBox>
+                                    <VBox styleClass="speedup-tile">
+                                        <Label text="SPEEDUP" styleClass="metric-label-light"/>
+                                        <Label fx:id="speedupLabel" text="&#8212;" styleClass="speedup-value"/>
+                                    </VBox>
+                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                        <Label text="Match:" styleClass="field-label-dark"/>
+                                        <Label fx:id="matchLabel" text="&#8212;" styleClass="match-value"/>
+                                    </HBox>
+                                </VBox>
+
+                                <Label fx:id="liveHashRateLabel" text="0 hashes computed" styleClass="live-counter"/>
+
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label text="Run History" styleClass="section-title"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="exportButton" text="&#128190;  Export CSV" styleClass="secondary-button"/>
+                                </HBox>
+                                <TableView fx:id="historyTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                                    <columns>
+                                        <TableColumn fx:id="colThreads" text="Threads" prefWidth="55"/>
+                                        <TableColumn fx:id="colLength" text="Len" prefWidth="40"/>
+                                        <TableColumn fx:id="colSeqTime" text="Sequential" prefWidth="78"/>
+                                        <TableColumn fx:id="colParTime" text="Parallel" prefWidth="72"/>
+                                        <TableColumn fx:id="colSpeedup" text="Speedup" prefWidth="62"/>
+                                        <TableColumn fx:id="colEfficiency" text="Efficiency" prefWidth="68"/>
+                                        <TableColumn fx:id="colHashRate" text="Hashes/s" prefWidth="80"/>
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
+                                </TableView>
+                            </VBox>
+
+                            <VBox spacing="12" HBox.hgrow="ALWAYS" styleClass="chart-card">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Label text="Across runs" styleClass="section-title"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <ToggleButton text="Time" toggleGroup="$chartMetricGroup" styleClass="chip" selected="true"/>
+                                    <ToggleButton text="Speedup" toggleGroup="$chartMetricGroup" styleClass="chip"/>
+                                    <ToggleButton text="Efficiency" toggleGroup="$chartMetricGroup" styleClass="chip"/>
+                                </HBox>
+                                <BarChart fx:id="benchmarkChart" prefHeight="320" VBox.vgrow="NEVER"
+                                          legendVisible="true" barGap="4" categoryGap="22">
+                                    <xAxis><CategoryAxis label="Run"/></xAxis>
+                                    <yAxis><NumberAxis label="Value"/></yAxis>
+                                </BarChart>
+                                <Label fx:id="systemInfoLabel" text="" styleClass="chart-hint" wrapText="true"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>
