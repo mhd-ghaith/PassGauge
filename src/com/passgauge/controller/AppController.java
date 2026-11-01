@@ -89,6 +89,7 @@ public class AppController {
     @FXML private Label efficiencyLabel;
     @FXML private Label speedupLabel;
     @FXML private Label matchLabel;
+    @FXML private Label summaryLabel;
     @FXML private Label statusLabel;
     @FXML private Label keyspaceLabel;
     @FXML private Label systemInfoLabel;
@@ -280,6 +281,57 @@ public class AppController {
         return sb.toString().toCharArray();
     }
 
+    /** Human-readable description of a charset, for the plain-English run summary. */
+    private String describeCharset(char[] charset) {
+        boolean hasLower = false, hasUpper = false, hasDigit = false, hasSymbol = false;
+        for (char c : charset) {
+            if (Character.isLowerCase(c)) hasLower = true;
+            else if (Character.isUpperCase(c)) hasUpper = true;
+            else if (Character.isDigit(c)) hasDigit = true;
+            else hasSymbol = true;
+        }
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        if (hasLower) parts.add("lowercase letters");
+        if (hasUpper) parts.add("uppercase letters");
+        if (hasDigit) parts.add("digits");
+        if (hasSymbol) parts.add("symbols");
+        if (parts.isEmpty()) return "an unknown character set";
+        if (parts.size() == 1) return parts.get(0);
+        return String.join(", ", parts.subList(0, parts.size() - 1)) + " and " + parts.get(parts.size() - 1);
+    }
+
+    /** Builds the plain-English "what did we just compare" sentence shown after each run. */
+    private String buildSummary(double seqSeconds, double parSeconds, double speedup, double efficiency,
+                                 int threads, int maxLength, char[] charset, boolean found) {
+        double keyspace = 0;
+        for (int len = 1; len <= maxLength; len++) {
+            keyspace += Math.pow(charset.length, len);
+        }
+        String charsetDesc = describeCharset(charset);
+        String keyspaceStr = formatCount(keyspace);
+
+        String effWord = efficiency >= 80 ? "excellent" : efficiency >= 50 ? "good" : "modest";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("This compared searching every possible password of up to ").append(maxLength)
+          .append(" characters using ").append(charsetDesc).append(" (~").append(keyspaceStr)
+          .append(" candidates) with a single thread, against splitting that same search across ")
+          .append(threads).append(" threads. ");
+
+        if (found) {
+            sb.append("Both found the password in ").append(String.format("%.4f", seqSeconds))
+              .append("s (1 thread) versus ").append(String.format("%.4f", parSeconds))
+              .append("s (").append(threads).append(" threads) \u2014 a ")
+              .append(String.format("%.2f", speedup)).append("x speedup, using the extra threads with ")
+              .append(effWord).append(" (").append(String.format("%.0f", efficiency)).append("%) efficiency.");
+        } else {
+            sb.append("Neither search found a match within that length limit \u2014 try increasing Max Length. ")
+              .append("Even so, the ").append(String.format("%.2f", speedup))
+              .append("x speedup shows how much faster the same exhaustive search runs in parallel.");
+        }
+        return sb.toString();
+    }
+
     private void updateCharsetChips(String password) {
         boolean hasLower = false, hasUpper = false, hasDigit = false, hasSymbol = false;
         if (password != null) {
@@ -383,7 +435,7 @@ public class AppController {
                 ParallelCracker par = new ParallelCracker();
                 CrackResult parResult = par.crack(targetHash, charset, maxLength, threads, hashCounter);
 
-                Platform.runLater(() -> showResults(seqResult, parResult, threads, maxLength));
+                Platform.runLater(() -> showResults(seqResult, parResult, threads, maxLength, charset));
                 return null;
             }
         };
@@ -416,7 +468,7 @@ public class AppController {
         thread.start();
     }
 
-    private void showResults(CrackResult seqResult, CrackResult parResult, int threads, int maxLength) {
+    private void showResults(CrackResult seqResult, CrackResult parResult, int threads, int maxLength, char[] charset) {
         double seqSeconds = seqResult.getElapsedSeconds();
         double parSeconds = parResult.getElapsedSeconds();
         double speedup = parSeconds > 0 ? seqSeconds / parSeconds : 0;
@@ -436,6 +488,8 @@ public class AppController {
             matchLabel.setText("Not found in search space");
             matchLabel.getStyleClass().remove("match-found");
         }
+
+        summaryLabel.setText(buildSummary(seqSeconds, parSeconds, speedup, efficiency, threads, maxLength, charset, parResult.isFound()));
 
         RunRecord record = new RunRecord(threads, maxLength, seqSeconds, parSeconds,
                 speedup, efficiency, parResult.getHashesPerSecond());

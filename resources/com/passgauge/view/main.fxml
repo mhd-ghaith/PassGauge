@@ -169,6 +169,7 @@
                                         <Label text="Match:" styleClass="field-label-dark"/>
                                         <Label fx:id="matchLabel" text="&#8212;" styleClass="match-value"/>
                                     </HBox>
+                                    <Label fx:id="summaryLabel" text="" wrapText="true" styleClass="explanation-label"/>
                                 </VBox>
 
                                 <Label fx:id="liveHashRateLabel" text="0 hashes computed" styleClass="live-counter"/>
